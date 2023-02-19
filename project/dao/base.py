@@ -6,6 +6,7 @@ from sqlalchemy.orm import scoped_session
 from werkzeug.exceptions import NotFound
 from project.setup.db.models import Base
 
+
 T = TypeVar('T', bound=Base)
 
 
@@ -22,11 +23,16 @@ class BaseDAO(Generic[T]):
     def get_by_id(self, pk: int) -> Optional[T]:
         return self._db_session.query(self.__model__).get(pk)
 
-    def get_all(self, page: Optional[int] = None) -> List[T]:
+    def get_all(self, page: Optional[int] = None, status: Optional[str] = None) -> List[T]:
         stmt: BaseQuery = self._db_session.query(self.__model__)
         if page:
             try:
                 return stmt.paginate(page, self._items_per_page).items
+            except NotFound:
+                return []
+        if status:
+            try:
+                return stmt.order_by(Base.year.desc())
             except NotFound:
                 return []
         return stmt.all()
