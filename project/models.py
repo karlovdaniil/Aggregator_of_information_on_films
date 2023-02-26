@@ -26,7 +26,6 @@ class DirectorSchema(Schema):
     name = fields.Str()
 
 
-
 class Movie(models.Base):
     __tablename__ = 'movies'
 
@@ -53,7 +52,7 @@ class MovieSchema(Schema):
 class User(models.Base):
     __tablename__ = 'users'
 
-    email = Column(String(100), unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     name = Column(String)
     surname = Column(Integer)

@@ -2,23 +2,24 @@ import base64
 import hashlib
 import hmac
 
-from dao.user import UserDAO
-from helpers.constants import PWD_HASH_ITERATIONS, PWD_HASH_SALT
+from project.dao.user import UserDAO
+from project.config import BaseConfig
+from project.models import User
 
 
-class UserService:
+class UsersService:
 
     def __init__(self, dao: UserDAO):
         self.dao = dao
 
-    def get_one(self, uid):
+    def get_one(self, uid: int) -> User:
         return self.dao.get_user_by_id(uid)
 
-    def get_all(self):
+    def get_all(self) -> list[User]:
         return self.dao.get_all()
 
-    def get_by_username(self, username):
-        return self.dao.get_user_by_username(username)
+    def get_by_email(self, email):
+        return self.dao.get_user_by_email(email)
 
     def delete(self, uid):
         self.dao.delete(uid)
@@ -27,20 +28,20 @@ class UserService:
         hash_digest = hashlib.pbkdf2_hmac(
             'sha256',
             password.encode('utf-8'),
-            PWD_HASH_SALT,
-            PWD_HASH_ITERATIONS
+            BaseConfig.PWD_HASH_SALT,
+            BaseConfig.PWD_HASH_ITERATIONS
         )
 
         return base64.b64encode(hash_digest)
 
-    def comprare_passwords(self, hash, password):
-        decode_digest = base64.b64decode(hash)
+    def compare_passwords(self, hash_password, password):
+        decode_digest = base64.b64decode(hash_password)
 
         hash_digest = hashlib.pbkdf2_hmac(
             'sha256',
             password.encode('utf-8'),
-            PWD_HASH_SALT,
-            PWD_HASH_ITERATIONS
+            BaseConfig.PWD_HASH_SALT,
+            BaseConfig.PWD_HASH_ITERATIONS
         )
 
         return hmac.compare_digest(decode_digest, hash_digest)
@@ -54,7 +55,3 @@ class UserService:
         user_d['password'] = self.get_hash(user_d['password'])
 
         return self.dao.create(user_d)
-
-
-
-

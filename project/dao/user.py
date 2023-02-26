@@ -27,7 +27,6 @@ class UserDAO:
         user = self.get_user_by_id(user_d.get('id'))
         user.email = user_d.get('email')
         user.password = user_d.get('password')
-        #user.role = user_d.get('role')
 
         self.session.add(user)
         self.session.commit()

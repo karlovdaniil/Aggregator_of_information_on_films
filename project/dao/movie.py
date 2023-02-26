@@ -1,5 +1,7 @@
 from project.models import Movie
 
+from project.config import BaseConfig
+
 
 class MovieDAO:
     def __init__(self, session):
@@ -14,7 +16,7 @@ class MovieDAO:
         movies = self.session.query(Movie)
         if status == 'new':
             movies.order_by(Movie.year.desc())
-        return movies.paginate(page=page).items
+        return movies.paginate(page=page, per_page=BaseConfig.ITEMS_PER_PAGE).items
 
     def get_by_director_id(self, val):
         return self.session.query(Movie).filter(Movie.director_id == val).all()

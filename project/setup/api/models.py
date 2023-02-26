@@ -22,3 +22,12 @@ movie: Model = api.model('Фильм', {
     'genre_id': fields.Integer(required=True, example=17),
     'director_id': fields.Integer(required=True, example=1),
 })
+
+user: Model = api.model('Пользователь', {
+    'id': fields.Integer(required=True, example=1),
+    'email': fields.String(required=True, max_length=100, example='email@email.ru'),
+    'password': fields.String(required=True, example='password'),
+    'name': fields.String(required=False, example='name'),
+    'surname': fields.String(required=False, example='surname'),
+    'favorite_genre': fields.String(required=False, example='favorite_genre'),
+})

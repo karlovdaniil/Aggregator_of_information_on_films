@@ -5,6 +5,7 @@ from flask_sqlalchemy import BaseQuery
 from sqlalchemy.orm import scoped_session
 from werkzeug.exceptions import NotFound
 from project.setup.db.models import Base
+from project.models import Movie
 
 
 T = TypeVar('T', bound=Base)
@@ -25,14 +26,11 @@ class BaseDAO(Generic[T]):
 
     def get_all(self, page: Optional[int] = None, status: Optional[str] = None) -> List[T]:
         stmt: BaseQuery = self._db_session.query(self.__model__)
-        if page:
+
+        if status == 'new':
             try:
+                stmt = stmt.order_by(Movie.year.desc())
                 return stmt.paginate(page, self._items_per_page).items
-            except NotFound:
-                return []
-        if status:
-            try:
-                return stmt.order_by(Base.year.desc())
             except NotFound:
                 return []
         return stmt.all()
