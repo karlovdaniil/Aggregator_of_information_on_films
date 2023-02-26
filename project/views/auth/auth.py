@@ -1,4 +1,4 @@
-from flask import request, abort, jsonify
+from flask import request, abort
 from flask_restx import Namespace, Resource
 
 from project.container import user_service, auth_service
@@ -9,11 +9,10 @@ api = Namespace('auth')
 
 
 @api.route('/register/')
-class RegisterView(Resource):
-    @api.marshal_with(user, as_list=True, code=200, description='OK')
+class AuthRegisterView(Resource):
     def post(self):
         """
-        Get all directors.
+        Register new user.
         """
         req_json = request.json
         user_new = user_service.create(req_json)
@@ -22,11 +21,10 @@ class RegisterView(Resource):
 
 
 @api.route('/login/')
-class AuthView(Resource):
-    @api.marshal_with(user, as_list=True, code=200, description='OK')
+class AuthLoginView(Resource):
     def post(self):
         """
-        Get all directors.
+        Login user and get token.
         """
         req_json = request.json
 
@@ -35,17 +33,14 @@ class AuthView(Resource):
 
         try:
             tokens = auth_service.generate_token(email, password)
-            print(tokens)
-
             return tokens, 201
 
         except Exception as e:
             abort(401)
 
-    @api.marshal_with(user, as_list=True, code=200, description='OK')
     def put(self):
         """
-        Get all directors.
+        Refresh token by valid user.
         """
         req_json = request.json
 

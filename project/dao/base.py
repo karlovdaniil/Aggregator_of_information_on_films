@@ -1,6 +1,6 @@
 from typing import Generic, List, Optional, TypeVar
 
-from flask import current_app
+from flask import current_app, request
 from flask_sqlalchemy import BaseQuery
 from sqlalchemy.orm import scoped_session
 from werkzeug.exceptions import NotFound
@@ -27,10 +27,9 @@ class BaseDAO(Generic[T]):
     def get_all(self, page: Optional[int] = None, status: Optional[str] = None) -> List[T]:
         stmt: BaseQuery = self._db_session.query(self.__model__)
 
+        page = int(request.args.get('page'))
+        status = request.args.get('status')
+
         if status == 'new':
-            try:
-                stmt = stmt.order_by(Movie.year.desc())
-                return stmt.paginate(page, self._items_per_page).items
-            except NotFound:
-                return []
-        return stmt.all()
+            stmt = stmt.order_by(Movie.year.desc())
+        return stmt.paginate(page=page, per_page=self._items_per_page, error_out=False).items
