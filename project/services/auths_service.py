@@ -34,16 +34,24 @@ class AuthService:
         data['exp'] = calendar.timegm(days_token.timetuple())
         refresh_token = jwt.encode(data, BaseConfig.SECRET_KEY, algorithm=BaseConfig.ALGO)
 
-        print(access_token)
-        print(refresh_token)
-
         return {
             'access_token': access_token,
             'refresh_token': refresh_token
         }
 
-    def refresh_token(self, token):
-        data = jwt.decode(jwt=token, key=BaseConfig.SECRET_KEY, algoritms=[BaseConfig.ALGO])
+    def refresh_tokens(self, token):
+        data = jwt.decode(jwt=token, key=BaseConfig.SECRET_KEY, algorithms=[BaseConfig.ALGO])
         email = data.get('email')
 
-        return self.generate_token(email, None, is_refresh=True)
+        tokens = self.generate_token(email, None, is_refresh=True)
+
+        return tokens
+
+    def validate_token(self, access_token, refresh_token):
+        for token in (access_token, refresh_token):
+            try:
+                jwt.decode(jwt=token, key=BaseConfig.SECRET_KEY, algorithms=[BaseConfig.ALGO])
+            except Exception as e:
+                return False
+
+        return True

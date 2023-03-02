@@ -3,7 +3,6 @@ from typing import Generic, List, Optional, TypeVar
 from flask import current_app, request
 from flask_sqlalchemy import BaseQuery
 from sqlalchemy.orm import scoped_session
-from werkzeug.exceptions import NotFound
 from project.setup.db.models import Base
 from project.models import Movie
 
@@ -27,7 +26,7 @@ class BaseDAO(Generic[T]):
     def get_all(self, page: Optional[int] = None, status: Optional[str] = None) -> List[T]:
         stmt: BaseQuery = self._db_session.query(self.__model__)
 
-        page = int(request.args.get('page'))
+        page = int(request.args.get('page', 0))
         status = request.args.get('status')
 
         if status == 'new':

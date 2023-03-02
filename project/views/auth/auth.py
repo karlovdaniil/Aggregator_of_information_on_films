@@ -2,7 +2,6 @@ from flask import request, abort
 from flask_restx import Namespace, Resource
 
 from project.container import user_service, auth_service
-from project.setup.api.models import user
 
 
 api = Namespace('auth')
@@ -47,8 +46,13 @@ class AuthLoginView(Resource):
         access_token = req_json.get('access_token')
         refresh_token = req_json.get('refresh_token')
 
+        validated = auth_service.validate_token(access_token, refresh_token)
+
+        if not validated:
+            return 'Invalid token', 400
+
         try:
-            tokens = auth_service.refresh_token(access_token, refresh_token)
+            tokens = auth_service.refresh_tokens(refresh_token)
             return tokens, 201
 
         except Exception as e:
